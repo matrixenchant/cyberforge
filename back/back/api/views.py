@@ -1,3 +1,3 @@
 from django.shortcuts import render
 
-# Create your views here.
+# Minimum 2 FBV and 2 CBV

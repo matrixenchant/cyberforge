@@ -1,2 +1,2 @@
 
-# Minimum 2 Serializer and 2 ModelSerializer
+# Minimum 2 Serializers and 2 ModelSerializers
