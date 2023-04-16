@@ -1,1 +1,13 @@
-<p>login works!</p>
+<div *ngIf="logged">
+  <button (click)="logout()">Log out</button>
+</div>
+
+<div *ngIf="!logged">
+  <fieldset>
+    <label>Username</label>
+    <input type="text" [(ngModel)]="username">
+    <label>Password</label>
+    <input type="password" [(ngModel)]="password">
+    <button (click)="login()">Log in</button>
+  </fieldset>
+</div>

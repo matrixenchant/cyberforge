@@ -1,3 +1,7 @@
+export interface AuthToken{
+  token:string;
+}
+
 export interface UserPC{
   id:number;
   user:string;

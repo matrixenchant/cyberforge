@@ -9,6 +9,9 @@ import { ConstructorComponent } from './constructor/constructor.component';
 import { PcComponentComponent } from './pc-component/pc-component.component';
 import { LoginComponent } from './login/login.component';
 import {RouterModule} from "@angular/router";
+import {FormsModule} from "@angular/forms";
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
+import {AuthInterceptor} from "./AuthInterceptor";
 
 @NgModule({
   declarations: [
@@ -23,8 +26,16 @@ import {RouterModule} from "@angular/router";
     BrowserModule,
     AppRoutingModule,
     RouterModule,
+    FormsModule,
+    HttpClientModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass:AuthInterceptor,
+      multi:true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,9 +1,11 @@
 
 from django.urls import path
 from api import views
+from rest_framework_jwt.views import obtain_jwt_token
 
 # Example
 urlpatterns = [
+     path('login/', obtain_jwt_token),
      path('userpc/', views.UserPCListApiView.as_view()),
      path('userpc/<int:pk>/', views.UserPCDetailApiView.as_view()),
      path('cpu/', views.CPUListApiView.as_view()),

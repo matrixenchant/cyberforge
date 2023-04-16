@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {Cooling, Corpus, CPU, Memory, Motherboard, PowerUnit, RAM, UserPC, VideoCard} from "./models";
+import {AuthToken, Cooling, Corpus, CPU, Memory, Motherboard, PowerUnit, RAM, UserPC, VideoCard} from "./models";
 import {Observable} from "rxjs";
 
 @Injectable({
@@ -10,6 +10,9 @@ export class PcServiceService {
 
   BASE_URL = 'http://127.0.0.1:8000'
   constructor(private client:HttpClient) { }
+  login(username:string, password:string):Observable<AuthToken>{
+    return this.client.post<AuthToken>(`${this.BASE_URL}/api/login/`, {username, password})
+  }
   getListUserPC():Observable<UserPC[]>{
     return this.client.get<UserPC[]>(`${this.BASE_URL}/api/userpc/`)
   }
