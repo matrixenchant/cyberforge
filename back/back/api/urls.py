@@ -5,6 +5,7 @@ from rest_framework_jwt.views import obtain_jwt_token
 
 # Example
 urlpatterns = [
+     #Вьюшка для вызова сборок аторизованных пользователей (там автоматически выйдут только его работы)
      path('login/', obtain_jwt_token),
      path('userpc/', views.UserPCListApiView.as_view()),
      path('userpc/<int:pk>/', views.UserPCDetailApiView.as_view()),

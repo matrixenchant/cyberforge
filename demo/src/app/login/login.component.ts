@@ -19,7 +19,7 @@ export class LoginComponent{
   }
   login(){
     this.pcservice.login(this.username, this.password).subscribe((data)=>{
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('token', data.jwt);
       this.logged=true;
     })
   }
