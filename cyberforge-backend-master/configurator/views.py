@@ -1,5 +1,7 @@
 from rest_framework import generics, mixins, status, permissions
-from rest_framework.decorators import api_view
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import api_view, authentication_classes
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from .models import Modification
@@ -7,9 +9,11 @@ from .serializers import *
 
 
 class ModificationList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
-    queryset = Modification.objects.all()
     serializer_class = ModificationSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        return Modification.objects.all()
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
@@ -18,13 +22,13 @@ class ModificationList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.
         return self.create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
-        serializer.save(author_id=self.request.user.id)
+        serializer.save(author_name=self.request.user.username)
 
 
 class ModificationDetail(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin,
                          generics.GenericAPIView):
     queryset = Modification.objects.all()
-    serializer_class = ModificationsSerializer
+    serializer_class = ModificationSerializer
     lookup_url_kwarg = 'id'
 
     def get(self, request, *args, **kwargs):
@@ -91,8 +95,8 @@ def HousingDetailF(request, id):
     if request.method == 'PUT':
         serializer = HousingSerializer(housing, data=request.data)
         if serializer.is_valid():
-            if not request.data.get('images'):
-                serializer.validated_data.pop('images', None)
+            if not request.data.get('static'):
+                serializer.validated_data.pop('static', None)
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -145,16 +149,16 @@ class RAMDetail(mixins.RetrieveModelMixin, generics.GenericAPIView):
 
 
 class GraphicsCardList(mixins.ListModelMixin, generics.GenericAPIView):
-    queryset = GraphicsCard.objects.all()
-    serializer_class = GraphicCardSerializer
+    queryset = GPU.objects.all()
+    serializer_class = GPUSerializer
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
 
 class GraphicsCardDetail(mixins.RetrieveModelMixin, generics.GenericAPIView):
-    queryset = GraphicsCard.objects.all()
-    serializer_class = GraphicCardSerializer
+    queryset = GPU.objects.all()
+    serializer_class = GPUSerializer
     lookup_url_kwarg = 'id'
 
     def get(self, request, *args, **kwargs):
@@ -179,16 +183,16 @@ class MotherboardDetail(mixins.RetrieveModelMixin, generics.GenericAPIView):
 
 
 class ProcessorList(mixins.ListModelMixin, generics.GenericAPIView):
-    queryset = Processor.objects.all()
-    serializer_class = ProcessorSerializer
+    queryset = CPU.objects.all()
+    serializer_class = CPUSerializer
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
 
 class ProcessorDetail(mixins.RetrieveModelMixin, generics.GenericAPIView):
-    queryset = Processor.objects.all()
-    serializer_class = ProcessorSerializer
+    queryset = CPU.objects.all()
+    serializer_class = CPUSerializer
     lookup_url_kwarg = 'id'
 
     def get(self, request, *args, **kwargs):

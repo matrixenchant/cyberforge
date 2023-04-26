@@ -5,11 +5,14 @@ interface User{
   email : string;
   phone: string;
   image : string;
-  modifications : UserPC[];
+  modifications : Modification[];
 }
-interface UserPC{
+interface Modification{
   id:number;
-  user:string;
+  name: string;
+  description: string;
+  author_name: string;
+  likes: number;
   components: PCComponent[];
 }
 
@@ -18,20 +21,23 @@ interface PCComponent{
   type:string;
   slug:string;
   hero:string;
-  label:string;
-  cost:number;
-  power:number;
-
-  spec: PCComponentSpec[]
+  name:string; // label
+  price:number; //cost
+  performance:number; //power
+  images: string;
+  producer: string;
+  spec: PCComponentSpec[];
 }
 
 interface PCComponentSpec{
   slug: string;
-  value: string
+  value: string;
 }
-
+interface Socket{
+  socket: string;
+}
 interface CPU extends PCComponent{
-  socket:string;
+  socket:Socket;
   processor_type: string;
   total_number_of_cores: number;
   total_number_of_threads: number;
@@ -40,7 +46,7 @@ interface CPU extends PCComponent{
   rated_power: number;
 }
 
-interface VideoCard extends PCComponent{
+interface GPU extends PCComponent{
   interface: string;
   video_memory_capacity: number;
   rated_power: number;
@@ -53,31 +59,29 @@ interface VideoCard extends PCComponent{
 }
 
 interface Motherboard extends PCComponent{
-  socket:string;
+  socket:Socket;
   form_factor:string;
   num_memory_slots: number;
   power_connectors: number;
 }
 
 interface RAM extends PCComponent{
-  interface: string;
-  form_factor: string;
-  disk_capacity: number;
-  read_speed: number;
-  write_speed: number;
+  memory_type: string;
+  memory_capacity: number;
+  memory_clock_speed: number;
 }
 
 interface Memory extends PCComponent{
-  memory_size:number;
-  memory_frequency:number;
-  memory_type:string;
+  disk_capacity: number;
+  read_speed: number;
+  write_speed: number;
   interface:string;
   form_factor:string;
 }
 
 interface Cooling extends PCComponent{
-  type:string; // Tuta
-  socket:string;
+  cooling_type:string;
+  socket:Socket;
   maximum_noise_level:number;
 }
 
@@ -88,8 +92,8 @@ interface Housing extends PCComponent{
 }
 
 interface PowerSupplyUnit extends PCComponent{
-  power:number; // Tuta
+  psu_power: number;
   efficiency: string;
   form_factor: string;
-  noise_level:number;
+  noise_level: string;
 }

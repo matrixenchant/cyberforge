@@ -5,11 +5,31 @@ class BaseModel(models.Model):
     name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     producer = models.CharField(max_length=50, blank=True, null=True)
-    images = models.ImageField(upload_to='images/', blank=True, null=True)
+    images = models.ImageField(upload_to='static', blank=True, null=True)
     performance = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
         abstract = True
+
+
+class Socket(models.Model):
+    SOCKET_CHOICES = [
+        ('LGA1150', 'LGA1150'),
+        ('LGA1151', 'LGA1151'),
+        ('LGA1155', 'LGA1155'),
+        ('LGA1156', 'LGA1156'),
+        ('LGA1200', 'LGA1200'),
+        ('LGA1700', 'LGA1700'),
+        ('LGA2011', 'LGA2011'),
+        ('LGA2011 v3', 'LGA2011 v3'),
+        ('LGA2066', 'LGA2066'),
+        ('AM4', 'AM4'),
+        ('sTR4', 'sTR4'),
+    ]
+    socket = models.CharField(max_length=20, choices=SOCKET_CHOICES, unique=True)
+
+    def __str__(self):
+        return self.socket
 
 
 class Cooling(BaseModel):
@@ -19,12 +39,12 @@ class Cooling(BaseModel):
         ('Liquid Cooler', 'Liquid Cooler')
     ]
 
-    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
-    socket = models.CharField(max_length=50)
+    cooling_type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    socket = models.ManyToManyField(Socket, related_name='sockets')
     maximum_noise_level = models.PositiveIntegerField()
 
     def __str__(self):
-        return f"{self.type} for {self.socket}"
+        return f"{self.name} type - {self.cooling_type} "
 
 
 class Housing(BaseModel):
@@ -47,7 +67,7 @@ class Housing(BaseModel):
     # number_of_3_5_internal_bays = models.PositiveIntegerField()
 
     def __str__(self):
-        return f"{self.name} case for {self.compatible_board_form_factor} motherboards, {' x '.join([i+'cm' for i in self.dimensions.split('x')])}"
+        return f"{self.name} case for {self.compatible_board_form_factor} motherboards, {' x '.join([i + 'cm' for i in self.dimensions.split('x')])}"
 
 
 class PowerSupplyUnit(BaseModel):
@@ -74,7 +94,7 @@ class PowerSupplyUnit(BaseModel):
         ('Flex-ATX', 'Flex-ATX')
     ]
 
-    power = models.PositiveIntegerField()
+    psu_power = models.PositiveIntegerField()
     efficiency = models.CharField(max_length=16, choices=STANDARD_CHOICES)
     form_factor = models.CharField(max_length=50, choices=FORM_FACTOR_CHOICES)
     noise_level = models.CharField(max_length=20, choices=NOISE_LEVEL_CHOICES, default='A++')
@@ -86,7 +106,7 @@ class PowerSupplyUnit(BaseModel):
     # adjustable_fan_speed = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Power Supply Unit ({self.power}W, {self.efficiency}, {self.noise_level})"
+        return f"{self.name} ({self.psu_power}W, {self.efficiency}, {self.noise_level})"
 
 
 class RAM(BaseModel):
@@ -110,7 +130,7 @@ class RAM(BaseModel):
         return f"{self.name} - {self.memory_capacity}GB {self.memory_type} RAM ({self.memory_clock_speed}MHz)"
 
 
-class GraphicsCard(BaseModel):
+class GPU(BaseModel):
     CHIPSET_MODEL_CHOICES = [
         ('GTX1050Ti', 'GTX1050Ti'),
         ('GTX1060', 'GTX1060'),
@@ -160,17 +180,8 @@ class Motherboard(BaseModel):
         ('ATX', 'ATX for MidiTower (244mm x 305mm)'),
         ('Micro-ATX', 'Micro-ATX for MiniTower (244mm x 244mm)'),
     ]
-    SOCKET_CHOICES = (
-        ('LGA1151', 'LGA1151'),
-        ('LGA1200', 'LGA1200'),
-        ('LGA1700', 'LGA1700'),
-        ('LGA2066', 'LGA2066'),
-        ('AM4', 'AM4'),
-        ('TR4', 'TR4'),
-        ('sTRX4', 'sTRX4'),
-    )
 
-    socket = models.CharField(max_length=50, choices=SOCKET_CHOICES)
+    socket = models.ForeignKey(Socket, on_delete=models.RESTRICT)
     form_factor = models.CharField(max_length=40, choices=FORM_FACTOR_CHOICES)
     num_memory_slots = models.IntegerField(default=4)
     # num_pci_express_slots_x1 = models.IntegerField()
@@ -178,10 +189,10 @@ class Motherboard(BaseModel):
     power_connectors = models.IntegerField()
 
     def __str__(self):
-        return self.socket + " " + self.form_factor
+        return f"{self.name} ({self.socket}) + {self.form_factor}"
 
 
-class Processor(BaseModel):
+class CPU(BaseModel):
     PROCESSOR_TYPE_CHOICES = (
         ('Celeron', 'Celeron'),
         ('Core i3', 'Core i3'),
@@ -191,16 +202,8 @@ class Processor(BaseModel):
         ('Pentium', 'Pentium'),
         ('Xeon', 'Xeon'),
     )
-    SOCKET_CHOICES = (
-        ('LGA1151', 'LGA1151'),
-        ('LGA1200', 'LGA1200'),
-        ('LGA1700', 'LGA1700'),
-        ('LGA2066', 'LGA2066'),
-        ('AM4', 'AM4'),
-        ('TR4', 'TR4'),
-        ('sTRX4', 'sTRX4')
-    )
-    socket = models.CharField(max_length=10, choices=SOCKET_CHOICES)
+
+    socket = models.ForeignKey(Socket, on_delete=models.RESTRICT)
     processor_type = models.CharField(max_length=10, choices=PROCESSOR_TYPE_CHOICES)
     total_number_of_cores = models.PositiveIntegerField()
     total_number_of_threads = models.PositiveIntegerField()
@@ -295,7 +298,7 @@ class Accessory(BaseModel):
 
 
 class Modification(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     description = models.CharField(max_length=255, default='')
     author_name = models.CharField(max_length=255, blank=True)
     likes = models.PositiveIntegerField(default=0)
@@ -303,16 +306,19 @@ class Modification(models.Model):
     housing = models.ForeignKey(Housing, on_delete=models.CASCADE)
     motherboard = models.ForeignKey(Motherboard, on_delete=models.CASCADE)
     power_supply = models.ForeignKey(PowerSupplyUnit, on_delete=models.CASCADE)
-    processor = models.ForeignKey(Processor, on_delete=models.CASCADE)
-    graphics_card = models.ForeignKey(GraphicsCard, on_delete=models.CASCADE)
+    cpu = models.ForeignKey(CPU, on_delete=models.CASCADE)
+    gpu = models.ForeignKey(GPU, on_delete=models.CASCADE)
     ram = models.ForeignKey(RAM, on_delete=models.CASCADE)
     memory = models.ForeignKey(Memory, on_delete=models.CASCADE)
     cooling = models.ForeignKey(Cooling, on_delete=models.CASCADE)
 
     # accessories = models.ManyToManyField(Accessory)
 
+    def is_compatible_cooling(self):
+        return self.motherboard.socket in self.cooling.socket
+
     def is_compatible(self):
-        return self.processor.socket == self.motherboard.socket
+        return self.cpu.socket == self.motherboard.socket
 
     def __str__(self):
-        return f"{self.name} {self.housing} {self.processor} {self.graphics_card} {self.memory}"
+        return f"{self.name} {self.housing} {self.cpu} {self.gpu} {self.memory}"

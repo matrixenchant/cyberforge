@@ -12,17 +12,17 @@ export class PcServiceService {
   login(username:string, password:string):Observable<AuthToken>{
     return this.client.post<AuthToken>(`${this.BASE_URL}/users/login/`, {username, password})
   }
-  getListUserPC():Observable<UserPC[]>{
-    return this.client.get<UserPC[]>(`${this.BASE_URL}/configurator/modifications/`)
+  getListUserPC():Observable<Modification[]>{
+    return this.client.get<Modification[]>(`${this.BASE_URL}/configurator/modifications/`)
   }
-  getUserPC(id:number):Observable<UserPC>{
-    return this.client.get<UserPC>(`${this.BASE_URL}/configurator/modifications/${id}/`)
+  getUserPC(id:number):Observable<Modification>{
+    return this.client.get<Modification>(`${this.BASE_URL}/configurator/modifications/${id}/`)
   }
-  addUserPC(userpc:UserPC){
-    return this.client.post<UserPC>(`${this.BASE_URL}/configurator/modifications/`, userpc)
+  addUserPC(modification:Modification){
+    return this.client.post<Modification>(`${this.BASE_URL}/configurator/modifications/`, modification)
   }
-  updateUserPC(userpc:UserPC, id:number){
-    return this.client.put<UserPC>(`${this.BASE_URL}/configurator/modifications/${id}/`, userpc)
+  updateUserPC(modification:Modification, id:number){
+    return this.client.put<Modification>(`${this.BASE_URL}/configurator/modifications/${id}/`, modification)
   }
   deleteUserPC(id:number){
     return this.client.delete<any>(`${this.BASE_URL}/configurator/modifications/${id}/`)
@@ -33,11 +33,11 @@ export class PcServiceService {
   getCPU(id:number):Observable<CPU>{
     return this.client.get<CPU>(`${this.BASE_URL}/configurator/processor/${id}/`)
   }
-  getListVideoCard():Observable<VideoCard[]>{
-    return this.client.get<VideoCard[]>(`${this.BASE_URL}/configurator/graphic_card/`)
+  getListVideoCard():Observable<GPU[]>{
+    return this.client.get<GPU[]>(`${this.BASE_URL}/configurator/graphic_card/`)
   }
-  getVideoCard(id:number):Observable<VideoCard>{
-    return this.client.get<VideoCard>(`${this.BASE_URL}/configurator/graphic_card/${id}/`)
+  getVideoCard(id:number):Observable<GPU>{
+    return this.client.get<GPU>(`${this.BASE_URL}/configurator/graphic_card/${id}/`)
   }
   getListMotherboard():Observable<Motherboard[]>{
     return this.client.get<Motherboard[]>(`${this.BASE_URL}/configurator/motherboard/`)

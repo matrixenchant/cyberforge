@@ -5,10 +5,8 @@ admin.site.register(Cooling)
 admin.site.register(Housing)
 admin.site.register(PowerSupplyUnit)
 admin.site.register(RAM)
-admin.site.register(GraphicsCard)
+admin.site.register(GPU)
 admin.site.register(Motherboard)
-admin.site.register(Processor)
-
-
-
-# Register your models here.
+admin.site.register(CPU)
+admin.site.register(Memory)
+admin.site.register(Socket)
