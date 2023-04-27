@@ -13,12 +13,14 @@ urlpatterns = [
     path('power_supply_unit/<int:id>/', PowerSupplyUnitDetail.as_view(), name='power_supply_unit-detail'),
     path('ram/', RAMList.as_view(), name='ram-list'),
     path('ram/<int:id>/', RAMDetail.as_view(), name='ram-detail'),
-    path('graphic_card/', GraphicsCardList.as_view(), name='graphic_card-list'),
-    path('graphic_card/<int:id>/', GraphicsCardDetail.as_view(), name='graphic_card-detail'),
+    path('gpu/', GPUList.as_view(), name='graphic_card-list'),
+    path('gpu/<int:id>/', GPUDetail.as_view(), name='graphic_card-detail'),
     path('motherboard/', MotherboardList.as_view(), name='motherboard-list'),
     path('motherboard/<int:id>/', MotherboardDetail.as_view(), name='motherboard-detail'),
-    path('processor/', ProcessorList.as_view(), name='processor-list'),
-    path('processor/<int:id>/', ProcessorDetail.as_view(), name='processor-detail'),
+    path('cpu/', CPUList.as_view(), name='processor-list'),
+    path('cpu/<int:id>/', CPUDetail.as_view(), name='processor-detail'),
+    path('memory/', MemoryList.as_view(), name='memory-list'),
+    path('memory/<int:id>/', MemoryDetail.as_view(), name='memory-detail'),
 ]
 
 

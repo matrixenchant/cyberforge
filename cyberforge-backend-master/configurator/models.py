@@ -2,11 +2,22 @@ from django.db import models
 
 
 class BaseModel(models.Model):
+    TYPE_CHOICES = [
+        ('Cooling', 'Cooling'),
+        ('Memory', 'Memory'),
+        ('Housing', 'Housing'),
+        ('CPU', 'CPU'),
+        ('Motherboard', 'Motherboard'),
+        ('GPU', 'GPU'),
+        ('RAM', 'RAM'),
+        ('PowerSupplyUnit', 'PowerSupplyUnit'),
+    ]
+
     name = models.CharField(max_length=255)
+    type = models.CharField(max_length=50, blank=True, choices=TYPE_CHOICES)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    producer = models.CharField(max_length=50, blank=True, null=True)
     images = models.ImageField(upload_to='static', blank=True, null=True)
-    performance = models.PositiveSmallIntegerField(default=0)
+    rating = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
         abstract = True
@@ -26,6 +37,9 @@ class Socket(models.Model):
         ('AM4', 'AM4'),
         ('sTR4', 'sTR4'),
     ]
+    spec_labels = [
+        {'slug': 'socket', 'label': 'Сокет'}
+    ]
     socket = models.CharField(max_length=20, choices=SOCKET_CHOICES, unique=True)
 
     def __str__(self):
@@ -39,8 +53,14 @@ class Cooling(BaseModel):
         ('Liquid Cooler', 'Liquid Cooler')
     ]
 
+    spec_labels = [
+        {'slug': 'cooling_type', 'label': 'Тип охлаждения'},
+        {'slug': 'sockets', 'label': 'Сокеты'},
+        {'slug': 'maximum_noise_level', 'label': 'Максимальный уровень шума'}
+    ]
+
     cooling_type = models.CharField(max_length=20, choices=TYPE_CHOICES)
-    socket = models.ManyToManyField(Socket, related_name='sockets')
+    sockets = models.ManyToManyField(Socket, related_name='sockets')
     maximum_noise_level = models.PositiveIntegerField()
 
     def __str__(self):
@@ -56,6 +76,11 @@ class Housing(BaseModel):
         (mini, 'Mini Tower'),
         (midi, 'Midi Tower'),
         (full, 'Full Tower'),
+    ]
+    spec_labels = [
+        {'slug': 'case_form_factor', 'label': 'Форм-фактор корпуса'},
+        {'slug': 'compatible_board_form_factor', 'label': 'Форма-фактор материнкской платы'},
+        {'slug': 'dimensions', 'label': 'Размеры'}
     ]
 
     case_form_factor = models.CharField(max_length=10, choices=CASE_FORM_FACTOR_CHOICES)
@@ -93,6 +118,12 @@ class PowerSupplyUnit(BaseModel):
         ('TFX', 'TFX'),
         ('Flex-ATX', 'Flex-ATX')
     ]
+    spec_labels = [
+        {'slug': 'psu_power', 'label': 'Мощность'},
+        {'slug': 'efficiency', 'label': 'Стандарт эффективности'},
+        {'slug': 'form_factor', 'label': 'Форм-фактор'},
+        {'slug': 'noise_level', 'label': 'Уровень шума'}
+    ]
 
     psu_power = models.PositiveIntegerField()
     efficiency = models.CharField(max_length=16, choices=STANDARD_CHOICES)
@@ -117,10 +148,14 @@ class RAM(BaseModel):
         ('DDR4', 'DDR4'),
         ('DDR5', 'DDR5'),
     ]
-
+    spec_labels = [
+        {'slug': 'memory_type', 'label': 'Тип памяти'},
+        {'slug': 'memory_capacity', 'label': 'Объем памяти'},
+        {'slug': 'memory_clock_speed', 'label': 'Частота памяти'},
+    ]
     memory_type = models.CharField(max_length=4, choices=MEMORY_TYPE_CHOICES)
-    memory_capacity = models.PositiveIntegerField()
-    memory_clock_speed = models.PositiveIntegerField()
+    memory_capacity = models.PositiveIntegerField(help_text='in GB')
+    memory_clock_speed = models.PositiveIntegerField(help_text='in Mhz')
 
     # supply_voltage = models.DecimalField(max_digits=3, decimal_places=1)
     # timings = models.CharField(max_length=5)
@@ -157,6 +192,17 @@ class GPU(BaseModel):
         ('PCIe 4.0', 'PCIe 4.0'),
         ('AGP', 'AGP'),
     ]
+    spec_labels = [
+        {'slug': 'interface', 'label': 'Интерфейс'},
+        {'slug': 'video_memory_capacity', 'label': 'Объем видеопамяти'},
+        {'slug': 'rated_power', 'label': 'Мощность'},
+        {'slug': 'video_memory_type', 'label': 'Тип видеопамяти'},
+        {'slug': 'technical_process', 'label': 'Технический процесс'},
+        {'slug': 'gpu_frequency', 'label': 'Частота GPU'},
+        {'slug': 'chipset_model', 'label': 'Модель'},
+        {'slug': 'connectors', 'label': 'Коннекторы'},
+        {'slug': 'length', 'label': 'Длина'},
+    ]
 
     interface = models.CharField(max_length=20, choices=INTERFACE_CHOICES)
     video_memory_capacity = models.PositiveIntegerField()
@@ -181,6 +227,13 @@ class Motherboard(BaseModel):
         ('Micro-ATX', 'Micro-ATX for MiniTower (244mm x 244mm)'),
     ]
 
+    spec_labels = [
+        {'slug': 'socket', 'label': 'Сокет'},
+        {'slug': 'form_factor', 'label': 'Форм-фактор'},
+        {'slug': 'num_memory_slots', 'label': 'Количество слотов памяти'},
+        {'slug': 'power_connectors', 'label': 'Количество коннектеров мощности'},
+    ]
+
     socket = models.ForeignKey(Socket, on_delete=models.RESTRICT)
     form_factor = models.CharField(max_length=40, choices=FORM_FACTOR_CHOICES)
     num_memory_slots = models.IntegerField(default=4)
@@ -202,6 +255,16 @@ class CPU(BaseModel):
         ('Pentium', 'Pentium'),
         ('Xeon', 'Xeon'),
     )
+
+    spec_labels = [
+        {'slug': 'socket', 'label': 'Сокет'},
+        {'slug': 'processor_type', 'label': 'Тип процессора'},
+        {'slug': 'total_number_of_cores', 'label': 'Количество ядер'},
+        {'slug': 'total_number_of_threads', 'label': 'Количество потоков'},
+        {'slug': 'clock_frequency', 'label': 'Частота ядра'},
+        {'slug': 'process_technology', 'label': 'Тех-процесс'},
+        {'slug': 'rated_power', 'label': 'Мощность'},
+    ]
 
     socket = models.ForeignKey(Socket, on_delete=models.RESTRICT)
     processor_type = models.CharField(max_length=10, choices=PROCESSOR_TYPE_CHOICES)
@@ -238,12 +301,19 @@ class Memory(BaseModel):
         ('mSATA', 'mSATA'),
         ('U2', 'U.2')
     ]
+    spec_labels = [
+        {'slug': 'interface', 'label': 'Интерфейс'},
+        {'slug': 'form_factor', 'label': 'Форм-фактор'},
+        {'slug': 'disk_capacity', 'label': 'Объем памяти'},
+        {'slug': 'read_speed', 'label': 'Скорость чтения'},
+        {'slug': 'write_speed', 'label': 'Скорость записи'},
+    ]
 
     interface = models.CharField(max_length=20)
     form_factor = models.CharField(max_length=20)
     disk_capacity = models.IntegerField(help_text='in GB')
-    read_speed = models.FloatField()
-    write_speed = models.FloatField()
+    read_speed = models.FloatField(help_text='in mb/s')
+    write_speed = models.FloatField(help_text='in mb/s')
 
     # interface_transfer_rate = models.FloatField()
 
@@ -315,7 +385,7 @@ class Modification(models.Model):
     # accessories = models.ManyToManyField(Accessory)
 
     def is_compatible_cooling(self):
-        return self.motherboard.socket in self.cooling.socket
+        return self.motherboard.socket in self.cooling.socket.all()
 
     def is_compatible(self):
         return self.cpu.socket == self.motherboard.socket

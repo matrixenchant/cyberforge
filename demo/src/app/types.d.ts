@@ -8,7 +8,6 @@ interface User{
   modifications : Modification[];
 }
 interface Modification{
-  id:number;
   name: string;
   description: string;
   author_name: string;
@@ -20,10 +19,9 @@ interface PCComponent{
   id:number;
   type:string;
   slug:string;
-  hero:string;
-  name:string; // label
+  name:string;
   price:number; //cost
-  performance:number; //power
+  rating:number; //power
   images: string;
   producer: string;
   spec: PCComponentSpec[];

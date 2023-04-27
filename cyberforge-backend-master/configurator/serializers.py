@@ -1,8 +1,26 @@
 from rest_framework import serializers
+from rest_framework.fields import SkipField
+
 from .models import Modification, Cooling, Housing, PowerSupplyUnit, RAM, GPU, Motherboard, CPU, Memory, Socket
 
 from rest_framework import serializers
 from .models import Modification
+
+
+class get_spec_ser:
+
+    def get_spec(self, obj):
+        spec_data = []
+        for label in obj.spec_labels:
+            value = getattr(obj, label['slug'], None)
+            if value is not None:
+                spec_data.append({
+                    'slug': label['slug'],
+                    'label': label['label'],
+                    'value': str(value)
+                })
+
+        return spec_data
 
 
 class SocketSerializer(serializers.ModelSerializer):
@@ -11,21 +29,42 @@ class SocketSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CoolingSerializer2(serializers.Serializer):
+class CoolingSerializer2(serializers.Serializer, get_spec_ser):
     TYPE_CHOICES = [
-        ('CPU Cooler', 'CPU Cooler'),
+        ('CPU Cooler', 'CPU Coolertea'),
         ('Case Fan', 'Case Fan'),
         ('Liquid Cooler', 'Liquid Cooler')
     ]
     name = serializers.CharField(max_length=255)
     price = serializers.DecimalField(max_digits=10, decimal_places=2, allow_null=True)
-    producer = serializers.CharField(max_length=50, allow_blank=True, allow_null=True)
+    type = serializers.CharField(max_length=50, allow_blank=True, allow_null=True)
     images = serializers.ImageField(required=False, allow_null=True, read_only=True)
-    performance = serializers.IntegerField(default=0, min_value=0)
+    rating = serializers.IntegerField(default=0, min_value=0)
 
-    cooling_type = serializers.ChoiceField(choices=TYPE_CHOICES)
-    socket = SocketSerializer(many=True)
-    maximum_noise_level = serializers.IntegerField()
+    cooling_type = serializers.ChoiceField(choices=TYPE_CHOICES, write_only=True)
+    sockets = SocketSerializer(many=True, write_only=True)
+    maximum_noise_level = serializers.IntegerField(write_only=True)
+
+    def get_spec(self, obj):
+        spec_data = []
+        for label in obj.spec_labels:
+            value = getattr(obj, label['slug'], None)
+            if value is not None:
+                if label['slug'] == 'sockets':
+                    serializer = SocketSerializer(value, many=True)
+                    value = serializer.data
+                spec_data.append({
+                    'slug': label['slug'],
+                    'label': label['label'],
+                    'value': str(value)
+                })
+
+        return spec_data
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['spec'] = self.get_spec(instance)
+        return ret
 
     def create(self, validated_data):
         sockets_data = validated_data.pop('sockets', [])
@@ -51,55 +90,158 @@ class CoolingSerializer2(serializers.Serializer):
             return [request.build_absolute_uri(image.image.url) for image in images]
         return []
 
+
 class CoolingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cooling
         fields = '__all__'
 
 
-class HousingSerializer(serializers.ModelSerializer):
+class HousingSerializer(serializers.ModelSerializer, get_spec_ser):
     class Meta:
         model = Housing
         fields = '__all__'
+        extra_kwargs = {
+            'case_form_factor': {'write_only': True},
+            'compatible_board_form_factor': {'write_only': True},
+            'dimensions': {'write_only': True},
+        }
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['spec'] = self.get_spec(instance)
+        return ret
 
 
-class PowerSupplyUnitSerializer(serializers.ModelSerializer):
+class PowerSupplyUnitSerializer(serializers.ModelSerializer, get_spec_ser):
     class Meta:
         model = PowerSupplyUnit
         fields = '__all__'
+        extra_kwargs = {
+            'psu_power': {'write_only': True},
+            'efficiency': {'write_only': True},
+            'form_factor': {'write_only': True},
+            'noise_level': {'write_only': True},
+        }
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['spec'] = self.get_spec(instance)
+        return ret
 
 
-class RAMSerializer(serializers.ModelSerializer):
+class RAMSerializer(serializers.ModelSerializer, get_spec_ser):
     class Meta:
         model = RAM
         fields = "__all__"
+        extra_kwargs = {
+            'memory_type': {'write_only': True},
+            'memory_capacity': {'write_only': True},
+            'memory_clock_speed': {'write_only': True},
+        }
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['spec'] = self.get_spec(instance)
+        return ret
 
 
-class GPUSerializer(serializers.ModelSerializer):
+class GPUSerializer(serializers.ModelSerializer, get_spec_ser):
     class Meta:
         model = GPU
         fields = '__all__'
+        extra_kwargs = {
+            'interface': {'write_only': True},
+            'video_memory_capacity': {'write_only': True},
+            'rated_power': {'write_only': True},
+            'video_memory_type': {'write_only': True},
+            'technical_process': {'write_only': True},
+            'gpu_frequency': {'write_only': True},
+            'chipset_model': {'write_only': True},
+            'connectors': {'write_only': True},
+            'length': {'write_only': True},
+        }
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['spec'] = self.get_spec(instance)
+        return ret
 
 
-class MotherboardSerializer(serializers.ModelSerializer):
+class MotherboardSerializer(serializers.ModelSerializer, get_spec_ser):
     class Meta:
         model = Motherboard
         fields = '__all__'
+        extra_kwargs = {
+            'socket': {'write_only': True},
+            'form_factor': {'write_only': True},
+            'num_memory_slots': {'write_only': True},
+            'power_connectors': {'write_only': True},
+        }
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['spec'] = self.get_spec(instance)
+        return ret
 
 
-class CPUSerializer(serializers.ModelSerializer):
+class CPUSerializer(serializers.ModelSerializer, get_spec_ser):
     class Meta:
         model = CPU
         fields = '__all__'
+        extra_kwargs = {
+            'socket': {'write_only': True},
+            'processor_type': {'write_only': True},
+            'total_number_of_cores': {'write_only': True},
+            'total_number_of_threads': {'write_only': True},
+            'clock_frequency': {'write_only': True},
+            'process_technology': {'write_only': True},
+            'rated_power': {'write_only': True},
+        }
+
+    def get_spec(self, obj):
+        spec_data = []
+        for label in obj.spec_labels:
+            value = getattr(obj, label['slug'], None)
+            if value is not None:
+                if label['slug'] == 'socket':
+                    serializer = SocketSerializer(value)
+                    value = serializer.data
+                spec_data.append({
+                    'slug': label['slug'],
+                    'label': label['label'],
+                    'value': str(value)
+                })
+
+        return spec_data
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['spec'] = self.get_spec(instance)
+        return ret
 
 
-class MemorySerializer(serializers.ModelSerializer):
+class MemorySerializer(serializers.ModelSerializer, get_spec_ser):
     class Meta:
         model = Memory
         fields = '__all__'
+        extra_kwargs = {
+            'socket': {'write_only': True},
+            'processor_type': {'write_only': True},
+            'total_number_of_cores': {'write_only': True},
+            'total_number_of_threads': {'write_only': True},
+            'clock_frequency': {'write_only': True},
+            'process_technology': {'write_only': True},
+            'rated_power': {'write_only': True},
+        }
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['spec'] = self.get_spec(instance)
+        return ret
 
 
-class ModificationSerializer(serializers.Serializer):
+class ModificationGetSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255)
     description = serializers.CharField(max_length=255, default='')
     author_name = serializers.CharField(max_length=255)
@@ -142,9 +284,18 @@ class ModificationSerializer(serializers.Serializer):
         return instance
 
 
-class ModificationsSerializer(serializers.ModelSerializer):
+class ModificationSerializer(serializers.ModelSerializer):
     is_compatible = serializers.BooleanField(read_only=True)
+    is_compatible_cooling = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Modification
         fields = '__all__'
+
+    def validate(self, data):
+        # проверка совместимости процессоров и материнских плат
+        if not data['cpu'].socket == data['motherboard'].socket:
+            raise serializers.ValidationError("Processor and motherboard are not compatible.")
+        elif not data['motherboard'].socket in data['cooling'].socket.all():
+            raise serializers.ValidationError("Motherboard socket and cooling socket are not compatible.")
+        return data

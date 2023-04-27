@@ -1,8 +1,8 @@
-<div *ngIf="logged">
+<div *ngIf="auth.isAuth">
   <button (click)="logout()">Log out</button>
 </div>
 
-<div *ngIf="!logged">
+<div *ngIf="!auth.isAuth">
   <fieldset>
     <label>Username</label>
     <input type="text" [(ngModel)]="username">
