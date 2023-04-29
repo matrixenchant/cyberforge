@@ -16,9 +16,11 @@ class PaginationClass(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 10
 
+    class Meta:
+        ordering = ['-id']
+
 
 class ModificationList(CsrfExemptMixin, mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
-    permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = PaginationClass
 
     def get_serializer_class(self):
@@ -80,7 +82,7 @@ def CoolingListF(request):
 
 class CoolingList(mixins.ListModelMixin, generics.GenericAPIView):
     queryset = Cooling.objects.all()
-    serializer_class = CoolingSerializer
+    serializer_class = CoolingSerializer2
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = PaginationClass
 
@@ -159,6 +161,7 @@ class PowerSupplyUnitDetail(mixins.RetrieveModelMixin, generics.GenericAPIView):
     serializer_class = PowerSupplyUnitSerializer
     lookup_url_kwarg = 'id'
     permission_classes = (IsAuthenticatedOrReadOnly,)
+
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
 
@@ -178,6 +181,7 @@ class RAMDetail(mixins.RetrieveModelMixin, generics.GenericAPIView):
     serializer_class = RAMSerializer
     lookup_url_kwarg = 'id'
     permission_classes = (IsAuthenticatedOrReadOnly,)
+
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
 

@@ -8,13 +8,9 @@ import {AuthService} from "../auth.service";
   styleUrls: ['./pc-component.component.css']
 })
 export class PcComponentComponent {
-  list!:PCComponent[];
-  currentPage!:Pagination;
-  modification: Modification = {name: "",
-    description: "",
-    author_name: "",
-    likes: 0,
-    components: []};
+  list:PCComponent[] = [];
+  currentPage:Pagination = {next:null, previous:null, results:[], count:0};
+  modification: Modification = {id:0, name: "", description: "", author_name: "", likes: 0, components: []};
   constructor(public serv:PcServiceService, public auth:AuthService){}
   ngOnInit(){
   }
@@ -22,9 +18,9 @@ export class PcComponentComponent {
     this.serv.getListPCComponent(type).subscribe((data) => {
       this.currentPage = data; this.list = data.results as PCComponent[]; this.serv.load = false;});
   }
-  getListCooling(){
-    this.serv.getListCooling().subscribe((data) => {
-      this.list = data; this.serv.load = false;});
+  newPage(url:string){
+    this.serv.getNewPage(url).subscribe((data) => {
+      this.currentPage = data; this.list = data.results as PCComponent[]; this.serv.load = false;});
   }
   add(component:PCComponent){
     this.del(component.type);
@@ -38,13 +34,8 @@ export class PcComponentComponent {
       console.log("Choose all the required components")
       return
     }
+    console.log(this.modification.components);
     this.serv.addModification(this.modification).subscribe((data)=>console.log('success!'));
-    /*
-    this.modification = {name: "",
-      description: "",
-      author_name: "",
-      likes: 0,
-      components: []};
-     */
+    //this.modification = {id:0, name: "", description: "", author_name: "", likes: 0,components: []};
   }
 }

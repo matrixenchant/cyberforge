@@ -23,18 +23,25 @@
   <button (click)="getList('motherboard')">Motherboard</button>
   <button (click)="getList('ram')">RAM</button>
   <button (click)="getList('memory')">Memory</button>
-  <button (click)="getListCooling()">Cooling</button>
+  <button (click)="getList('cooling')">Cooling</button>
   <button (click)="getList('housing')">Housing</button>
   <button (click)="getList('power_supply_unit')">PowerSupplyUnit</button>
 </div>
 
 <p *ngIf="serv.load">Loading...</p>
 <div *ngIf="!serv.load">
-  <p *ngFor="let x of list">
-    {{x.type}} <br>
-    {{x.name}} <br>
-    {{x.price}} <br>
-    <button (click)="add(x)">Add</button>
-    <img src="{{x.images}}" width="200px">
+  <p *ngFor="let basic of list" style="border: 1px black groove; margin: 5px; padding: 5px;">
+    Type: {{basic.type}} <br>
+    Id: {{basic.id}} <br>
+    Name: {{basic.name}} <br>
+    Price: {{basic.price}} <br>
+    Rating: {{basic.rating}} <br>
+    <img src="{{basic.images}}" width="100px"> <br>
+    <span *ngFor="let special of basic.spec" style="border: 1px green groove; margin: 5px;">
+      Slug: {{special.slug}}; Label: {{special.label}}; Value: {{special.value}} <br>
+    </span>
+    <button (click)="add(basic)">Add</button>
   </p>
+  <button *ngIf="currentPage.previous !== null" (click)="newPage(currentPage.previous)">Previous page</button>
+  <button *ngIf="currentPage.next !== null" (click)="newPage(currentPage.next)">Next page</button>
 </div>

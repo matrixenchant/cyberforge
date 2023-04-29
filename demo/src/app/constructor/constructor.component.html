@@ -1,16 +1,22 @@
-<p>constructor works!</p>
 <p *ngIf="serv.load">Loading...</p>
 <div *ngIf="!serv.load">
-  <div *ngFor="let modification of modifications">
-    {{modification.name}} <br>
-    {{modification.description}} <br>
-    {{modification.author_name}} <br>
-    {{modification.likes}} <br>
+  <div *ngFor="let modification of modifications" style="border: black 1px groove">
+    ID: {{modification.id}} <br>
+    Name: {{modification.name}} <br>
+    Description: {{modification.description}} <br>
+    Author_name: {{modification.author_name}} <br>
+    Number of likes: {{modification.likes}} <button *ngIf="auth.isAuth" (click)="like(modification)">Like</button><br>
+    <button *ngIf="auth.isAuth" (click)="delete(modification.id)">Delete</button> <br>
     <ul>
-      <li *ngFor="let component of modification.components">
-        {{component.type}}
-        {{component.name}}
+      <li *ngFor="let component of modification.components" style="border: green 1px groove">
+        Type: {{component.type}} <br>
+        Slug: {{component.slug}} <br>
+        Name: {{component.name}} <br>
+        Rating: {{component.rating}} <br>
+        Price: {{component.price}} <br>
       </li>
     </ul>
   </div>
+  <button *ngIf="currentPage.previous !== null" (click)="newPage(currentPage.previous)">Previous page</button>
+  <button *ngIf="currentPage.next !== null" (click)="newPage(currentPage.next)">Next page</button>
 </div>

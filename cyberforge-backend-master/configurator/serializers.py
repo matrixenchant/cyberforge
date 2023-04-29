@@ -8,7 +8,6 @@ from .models import Modification
 
 
 class get_spec_ser:
-
     def get_spec(self, obj):
         spec_data = []
         for label in obj.spec_labels:
@@ -52,7 +51,8 @@ class CoolingSerializer2(serializers.Serializer, get_spec_ser):
             if value is not None:
                 if label['slug'] == 'sockets':
                     serializer = SocketSerializer(value, many=True)
-                    value = serializer.data
+                    value = [item['socket'] for item in serializer.data]
+                    value = ", ".join(value)
                 spec_data.append({
                     'slug': label['slug'],
                     'label': label['label'],
@@ -206,7 +206,7 @@ class CPUSerializer(serializers.ModelSerializer, get_spec_ser):
             if value is not None:
                 if label['slug'] == 'socket':
                     serializer = SocketSerializer(value)
-                    value = serializer.data
+                    value = serializer.data['socket']
                 spec_data.append({
                     'slug': label['slug'],
                     'label': label['label'],
@@ -247,14 +247,45 @@ class ModificationGetSerializer(serializers.Serializer):
     author_name = serializers.CharField(max_length=255)
     likes = serializers.IntegerField(default=0)
 
-    housing = HousingSerializer()
-    motherboard = MotherboardSerializer()
-    power_supply = PowerSupplyUnitSerializer()
-    cpu = CPUSerializer()
-    gpu = GPUSerializer()
-    ram = RAMSerializer()
-    memory = MemorySerializer()
-    cooling = CoolingSerializer2()
+    housing = HousingSerializer
+    motherboard = MotherboardSerializer
+    power_supply = PowerSupplyUnitSerializer
+    cpu = CPUSerializer
+    gpu = GPUSerializer
+    ram = RAMSerializer
+    memory = MemorySerializer
+    cooling = CoolingSerializer2
+
+    comp = {
+        'housing': housing,
+        "motherboard": motherboard,
+        'power_supply': power_supply,
+        'cpu': cpu,
+        'gpu': gpu,
+        'ram': ram,
+        'memory': memory,
+        'cooling': cooling
+    }
+
+    def get_component(self, obj, comp):
+        component_data = []
+        for label in obj.components_labels:
+            value = getattr(obj, label['slug'], None)
+            if value is not None:
+                serializer = comp[label['slug']](value)
+                value = serializer.data
+                component_data.append({
+                    'slug': label['slug'],
+                    'label': label['label'],
+                    'value': value
+                })
+
+        return component_data
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['components'] = self.get_component(instance, self.comp)
+        return ret
 
     def validate(self, data):
         # proverka sovmestimosti proccessors and materi

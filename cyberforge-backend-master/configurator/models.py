@@ -368,6 +368,17 @@ class Accessory(BaseModel):
 
 
 class Modification(models.Model):
+    components_labels = [
+        {'slug': 'housing', 'label': 'Корпус'},
+        {'slug': 'motherboard', 'label': 'Материнская плата'},
+        {'slug': 'power_supply', 'label': 'Блок питания'},
+        {'slug': 'cpu', 'label': 'Процессор'},
+        {'slug': 'gpu', 'label': 'Видеокарта'},
+        {'slug': 'ram', 'label': 'RAM память'},
+        {'slug': 'memory', 'label': 'Энергонезависмая память'},
+        {'slug': 'cooling', 'label': 'Охлаждение'},
+    ]
+
     name = models.CharField(max_length=255, unique=True)
     description = models.CharField(max_length=255, default='')
     author_name = models.CharField(max_length=255, blank=True)

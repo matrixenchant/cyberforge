@@ -1,8 +1,11 @@
 from rest_framework import serializers
+
+from configurator.serializers import ModificationSerializer, ModificationGetSerializer
 from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    modifications = ModificationGetSerializer(many=True)
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'email', 'phone', 'username', 'password', 'modifications')

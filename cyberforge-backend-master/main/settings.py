@@ -15,12 +15,13 @@ DEBUG = True
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:4200',
-    'https://0ad7-95-56-95-4.ngrok-free.app'
+    'https://2e6c-95-56-95-4.ngrok-free.app',
 ]
 
 ALLOWED_HOSTS = [
-    '0ad7-95-56-95-4.ngrok-free.app',
-    '127.0.0.1'
+    '2e6c-95-56-95-4.ngrok-free.app',
+    '127.0.0.1',
+    'localhost'
 ]
 
 # Application definition
@@ -43,6 +44,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -50,7 +53,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     # 'users.middleware.JWTAuthenticationMiddleware',
 
 ]

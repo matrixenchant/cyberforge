@@ -9,7 +9,6 @@ export class PcServiceService {
   BASE_URL = "http://127.0.0.1:8000"
   constructor(private client:HttpClient) { }
   load:boolean = false;
-  currentPage!:Pagination;
   getListModification():Observable<Pagination>{
     this.load = true;
     return this.client.get<Pagination>(`${this.BASE_URL}/configurator/modifications/`).pipe(catchError(this.handleError));
@@ -18,9 +17,9 @@ export class PcServiceService {
     this.load = true;
     return this.client.get<Pagination>(`${this.BASE_URL}/configurator/${type}/`).pipe(catchError(this.handleError));
   }
-  getListCooling():Observable<Cooling[]>{
+  getNewPage(url:string):Observable<Pagination>{
     this.load = true;
-    return this.client.get<Cooling[]>(`${this.BASE_URL}/configurator/cooling/`).pipe(catchError(this.handleError));
+    return this.client.get<Pagination>(url).pipe(catchError(this.handleError));
   }
   getModification(id:number):Observable<Modification>{
     this.load = true;
@@ -31,60 +30,58 @@ export class PcServiceService {
     this.load = true;
     return this.client.get<PCComponent>(`${this.BASE_URL}/configurator/${type}/${id}/`)
   }
-  addModification(modification:Modification):Observable<Modification>{
+  checkList(modification:Modification){
     let housing, motherboard, power_supply, cpu, gpu, ram, memory, cooling;
     for(let x of modification.components){
       switch (x.type){
-        case "housing":
+        case "Housing":
           housing = x.id;
           break;
-        case "motherboard":
+        case "Motherboard":
           motherboard = x.id;
           break;
-        case "power_supply":
+        case "PowerSupplyUnit":
           power_supply = x.id;
           break;
-        case "cpu":
+        case "CPU":
           cpu = x.id;
           break;
-        case "gpu":
+        case "GPU":
           gpu = x.id;
           break;
-        case "ram":
+        case "RAM":
           ram = x.id;
           break;
-        case "memory":
+        case "Memory":
           memory = x.id;
           break;
-        case "cooling":
+        case "Cooling":
           cooling = x.id;
           break;
+        default:
+          console.log(x.type)
       }
     }
-    return this.client.post<Modification>(`${this.BASE_URL}/configurator/modifications/`, {
-      name: modification.name,
-      description: modification.name,
-      author_name: modification.author_name,
-      likes: modification.likes,
-      housing: housing,
-      motherboard: motherboard,
-      power_supply: power_supply,
-      cpu: cpu,
-      gpu: gpu,
-      ram: ram,
-      memory: memory,
-      cooling: cooling,}).pipe(catchError(this.handleError))
+    return [housing, motherboard, power_supply, cpu, gpu, ram, memory, cooling]
   }
-  updateModification(modification:Modification, id:number){
-    return this.client.put<Modification>(`${this.BASE_URL}/configurator/modifications/${id}/`, modification).pipe(
-      catchError(this.handleError))
+  addModification(modification:Modification):Observable<Modification>{
+    let list = this.checkList(modification);
+    return this.client.post<Modification>(`${this.BASE_URL}/configurator/modifications/`, {
+      name: modification.name, description: modification.description, author_name: modification.author_name,
+      likes: modification.likes, housing: list[0], motherboard: list[1], power_supply: list[2],
+      cpu: list[3], gpu: list[4], ram: list[5], memory: list[6], cooling: list[7],}).pipe(catchError(this.handleError))
+  }
+  updateModification(modification:Modification){
+    let list = this.checkList(modification);
+    return this.client.put<Modification>(`${this.BASE_URL}/configurator/modifications/${modification.id}/`, {
+      name: modification.name, description: modification.description, author_name: modification.author_name,
+        likes: modification.likes + 1, housing: list[0], motherboard: list[1], power_supply: list[2],
+        cpu: list[3], gpu: list[4], ram: list[5], memory: list[6], cooling: list[7],}).pipe(catchError(this.handleError))
   }
   deleteModification(id:number){
     return this.client.delete<any>(`${this.BASE_URL}/configurator/modifications/${id}/`).pipe(
       catchError(this.handleError))
   }
-
-
   handleError(error: any) {
     let errorMessage = '';
     //localStorage.removeItem('token');

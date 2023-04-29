@@ -3,8 +3,8 @@ interface AuthToken{
 }
 interface Pagination{
   count:number;
-  next:string;
-  previous:string;
+  next:string|null;
+  previous:string|null;
   results:Modification[]|PCComponent[];
 }
 interface User{
@@ -14,6 +14,7 @@ interface User{
   modifications : Modification[];
 }
 interface Modification{
+  id: number;
   name: string;
   description: string;
   author_name: string;
@@ -26,15 +27,15 @@ interface PCComponent{
   type:string;
   slug:string;
   name:string;
-  price:number; //cost
-  rating:number; //power
+  price:number;
+  rating:number;
   images: string;
-  producer: string;
   spec: PCComponentSpec[];
 }
 
 interface PCComponentSpec{
   slug: string;
+  label: string;
   value: string;
 }
 interface Socket{
