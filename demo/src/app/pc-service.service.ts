@@ -6,27 +6,21 @@ import {catchError, Observable, throwError} from "rxjs";
   providedIn: 'root'
 })
 export class PcServiceService {
-  BASE_URL = "http://127.0.0.1:8000" //https://2e6c-95-56-95-4.ngrok-free.app http://127.0.0.1:8000
+  BASE_URL = "http://127.0.0.1:8000"
   constructor(private client:HttpClient) { }
   load:boolean = false;
-  getPage(url:string):Observable<Pagination>{
-    return this.client.get<Pagination>(url).pipe(catchError(this.handleError));
-  }
-  getListModification():Modification[]{
+  currentPage!:Pagination;
+  getListModification():Observable<Pagination>{
     this.load = true;
-    let modifications:Modification[] = [];
-    this.getPage(`${this.BASE_URL}/configurator/modifications/`).subscribe(
-      (data) => modifications = data.results as Modification[]);
-    this.load = false;
-    return modifications
+    return this.client.get<Pagination>(`${this.BASE_URL}/configurator/modifications/`).pipe(catchError(this.handleError));
   }
-  getListPCComponent(type:string):PCComponent[]{
+  getListPCComponent(type:string):Observable<Pagination>{
     this.load = true;
-    let pccomponents:PCComponent[] = [];
-    this.getPage(`${this.BASE_URL}/configurator/${type}/`).subscribe(
-      (data) => pccomponents = data.results as PCComponent[])
-    this.load = false;
-    return pccomponents
+    return this.client.get<Pagination>(`${this.BASE_URL}/configurator/${type}/`).pipe(catchError(this.handleError));
+  }
+  getListCooling():Observable<Cooling[]>{
+    this.load = true;
+    return this.client.get<Cooling[]>(`${this.BASE_URL}/configurator/cooling/`).pipe(catchError(this.handleError));
   }
   getModification(id:number):Observable<Modification>{
     this.load = true;

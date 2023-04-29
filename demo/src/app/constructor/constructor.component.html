@@ -1,6 +1,6 @@
 <p>constructor works!</p>
-<p *ngIf="!serv.load">Loading...</p>
-<div *ngIf="serv.load">
+<p *ngIf="serv.load">Loading...</p>
+<div *ngIf="!serv.load">
   <div *ngFor="let modification of modifications">
     {{modification.name}} <br>
     {{modification.description}} <br>

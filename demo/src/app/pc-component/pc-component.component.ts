@@ -9,6 +9,7 @@ import {AuthService} from "../auth.service";
 })
 export class PcComponentComponent {
   list!:PCComponent[];
+  currentPage!:Pagination;
   modification: Modification = {name: "",
     description: "",
     author_name: "",
@@ -18,7 +19,12 @@ export class PcComponentComponent {
   ngOnInit(){
   }
   getList(type:string){
-    this.list = this.serv.getListPCComponent(type);
+    this.serv.getListPCComponent(type).subscribe((data) => {
+      this.currentPage = data; this.list = data.results as PCComponent[]; this.serv.load = false;});
+  }
+  getListCooling(){
+    this.serv.getListCooling().subscribe((data) => {
+      this.list = data; this.serv.load = false;});
   }
   add(component:PCComponent){
     this.del(component.type);

@@ -1,0 +1,13 @@
+﻿asgiref==3.4.1
+dj-rest-auth==3.0.0
+Django==3.2.18
+django-braces==1.15.0
+django-cors-headers==3.10.1
+djangorestframework==3.14.0
+djangorestframework-jwt==1.11.0
+Pillow==8.4.0
+psycopg2==2.9.6
+PyJWT==1.7.1
+pytz==2023.3
+sqlparse==0.4.3
+typing-extensions==4.1.1

@@ -6,7 +6,7 @@ import {HttpClient} from "@angular/common/http";
   providedIn: 'root'
 })
 export class AuthService {
-  BASE_URL = 'http://127.0.0.1:8000'//https://2e6c-95-56-95-4.ngrok-free.app http://127.0.0.1:8000
+  BASE_URL = 'http://127.0.0.1:8000'
   isAuth:boolean = false;
   constructor(private client:HttpClient) {
     const token = localStorage.getItem('token');

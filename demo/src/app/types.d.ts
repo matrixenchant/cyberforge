@@ -2,6 +2,9 @@ interface AuthToken{
   token:string;
 }
 interface Pagination{
+  count:number;
+  next:string;
+  previous:string;
   results:Modification[]|PCComponent[];
 }
 interface User{
@@ -82,7 +85,7 @@ interface Memory extends PCComponent{
 
 interface Cooling extends PCComponent{
   cooling_type:string;
-  socket:Socket;
+  sockets:Socket[];
   maximum_noise_level:number;
 }
 

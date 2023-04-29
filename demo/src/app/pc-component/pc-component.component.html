@@ -23,12 +23,12 @@
   <button (click)="getList('motherboard')">Motherboard</button>
   <button (click)="getList('ram')">RAM</button>
   <button (click)="getList('memory')">Memory</button>
-  <button (click)="getList('cooling')">Cooling</button>
+  <button (click)="getListCooling()">Cooling</button>
   <button (click)="getList('housing')">Housing</button>
   <button (click)="getList('power_supply_unit')">PowerSupplyUnit</button>
 </div>
 
-<p *ngIf="serv.load">Loading</p>
+<p *ngIf="serv.load">Loading...</p>
 <div *ngIf="!serv.load">
   <p *ngFor="let x of list">
     {{x.type}} <br>

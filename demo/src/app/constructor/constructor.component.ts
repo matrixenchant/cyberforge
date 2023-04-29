@@ -9,10 +9,11 @@ import {AuthService} from "../auth.service";
 })
 export class ConstructorComponent {
   modifications!: Modification[];
-  page!:Pagination;
+  currentPage!:Pagination;
   constructor(public serv:PcServiceService) {
   }
   ngOnInit(){
-    this.modifications = this.serv.getListModification();
+    this.serv.getListModification().subscribe((data) => {
+      this.currentPage=data; this.modifications=data.results as Modification[]; this.serv.load = false;});
   }
 }
