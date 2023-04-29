@@ -4,9 +4,11 @@ import {MainComponent} from "./main/main.component";
 import {ErrorComponent} from "./error/error.component";
 import {ConstructorComponent} from "./constructor/constructor.component";
 import {LoginComponent} from "./login/login.component";
+import {PcComponentComponent} from "./pc-component/pc-component.component";
 
 const routes: Routes = [
   {path:'main',component:MainComponent},
+  {path:'main/pccomponent',component:PcComponentComponent},
   {path:'main/constructor',component:ConstructorComponent},
   {path:'login',component:LoginComponent},
   {path:'', redirectTo:'main', pathMatch:'full'},

@@ -12,12 +12,12 @@ class JWTAuthenticationMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        token = request.COOKIES.get('jwt')
+        token = request.META.get('HTTP_AUTHORIZATION', '').split(' ')[1]
 
         if token:
             try:
                 payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
-                user = User.objects.get(id  =payload['id'])
+                user = User.objects.get(pk=payload['id'])
                 request.user = user
             except (jwt.ExpiredSignatureError, ObjectDoesNotExist):
                 pass

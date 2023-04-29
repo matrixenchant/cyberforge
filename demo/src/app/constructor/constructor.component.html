@@ -1,2 +1,16 @@
 <p>constructor works!</p>
-<app-pc-component></app-pc-component>
+<p *ngIf="!serv.load">Loading...</p>
+<div *ngIf="serv.load">
+  <div *ngFor="let modification of modifications">
+    {{modification.name}} <br>
+    {{modification.description}} <br>
+    {{modification.author_name}} <br>
+    {{modification.likes}} <br>
+    <ul>
+      <li *ngFor="let component of modification.components">
+        {{component.type}}
+        {{component.name}}
+      </li>
+    </ul>
+  </div>
+</div>

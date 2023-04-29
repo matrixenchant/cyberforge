@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
 import {PcServiceService} from "../pc-service.service";
-import {Observable} from "rxjs";
 import {AuthService} from "../auth.service";
 
 @Component({
@@ -11,7 +9,6 @@ import {AuthService} from "../auth.service";
 })
 export class PcComponentComponent {
   list!:PCComponent[];
-  currentComponentType!:string;
   modification: Modification = {name: "",
     description: "",
     author_name: "",
@@ -20,52 +17,15 @@ export class PcComponentComponent {
   constructor(public serv:PcServiceService, public auth:AuthService){}
   ngOnInit(){
   }
-  listCPU(){
-    this.serv.getListCPU().subscribe((data)=> this.list = data);
-    this.serv.load = false;
-    this.currentComponentType = "cpu";
+  getList(type:string){
+    this.list = this.serv.getListPCComponent(type);
   }
-  listGPU(){
-    this.serv.getListGPU().subscribe((data)=> this.list = data);
-    this.serv.load = false;
-    this.currentComponentType = "gpu";
+  add(component:PCComponent){
+    this.del(component.type);
+    this.modification.components.push(component);
   }
-  listMotherboard(){
-    this.serv.getListMotherboard().subscribe((data)=> this.list = data);
-    this.serv.load = false;
-    this.currentComponentType = "motherboard";
-  }
-  listPowerSupplyUnit(){
-    this.serv.getListPowerSupplyUnit().subscribe((data)=> this.list = data);
-    this.serv.load = false;
-    this.currentComponentType = "powersupplyunit";
-  }
-  listRAM(){
-    this.serv.getListRAM().subscribe((data)=> this.list = data);
-    this.serv.load = false;
-    this.currentComponentType = "ram";
-  }
-  listHousing(){
-    this.serv.getListHousing().subscribe((data)=> this.list = data);
-    this.serv.load = false;
-    this.currentComponentType = "housing";
-  }
-  listCooling(){
-    this.serv.getListCooling().subscribe((data)=> this.list = data);
-    this.serv.load = false;
-    this.currentComponentType = "cooling";
-  }
-  listMemory(){
-    this.serv.getListMemory().subscribe((data)=> this.list = data);
-    this.serv.load = false;
-    this.currentComponentType = "memory";
-  }
-  add(x:PCComponent){
-    this.del(x.type);
-    this.modification.components.push(x);
-  }
-  del(s:string){
-    this.modification.components = this.modification.components.filter((component)=>component.type!=s);
+  del(type:string){
+    this.modification.components = this.modification.components.filter((component)=>component.type!=type);
   }
   post(){
     if (this.modification.components.length < 8){

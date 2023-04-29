@@ -385,7 +385,7 @@ class Modification(models.Model):
     # accessories = models.ManyToManyField(Accessory)
 
     def is_compatible_cooling(self):
-        return self.motherboard.socket in self.cooling.socket.all()
+        return self.motherboard.socket in self.cooling.sockets.all()
 
     def is_compatible(self):
         return self.cpu.socket == self.motherboard.socket

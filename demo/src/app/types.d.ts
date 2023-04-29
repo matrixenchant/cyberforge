@@ -1,5 +1,8 @@
 interface AuthToken{
-  jwt:string;
+  token:string;
+}
+interface Pagination{
+  results:Modification[]|PCComponent[];
 }
 interface User{
   email : string;

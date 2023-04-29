@@ -1,21 +1,23 @@
-from django.contrib.auth import authenticate
+import jwt
+from braces.views import CsrfExemptMixin
+from django.contrib.auth import authenticate, get_user_model
 from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
-import jwt, datetime
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from rest_framework_jwt.views import verify_jwt_token
 
 from main import settings
-from .models import User
-
 from users.serializers import UserSerializer
 
-def my_view(request):
-    user_id = request.user.get('user_id')
-    print('User ID:', user_id)
+User = get_user_model()
 
 
-class LoginPageAPIView(APIView):
+class LoginPageAPIView(CsrfExemptMixin, APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         username = request.data['username']
         password = request.data['password']
@@ -25,23 +27,14 @@ class LoginPageAPIView(APIView):
         if user is None:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-
         if not user.check_password(password):
             raise AuthenticationFailed('Password is incorrect!')
 
-        payload = {
-            'id': user.id,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7),
-            'iat': datetime.datetime.utcnow()
-        }
-
+        payload = {'id': user.id}
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+        response = Response({'token': token}, status=200)
+        response['Authorization'] = f'Bearer {token}'
 
-        response = Response()
-        response.set_cookie(key='jwt', value=token, httponly=True)
-        response.data = {
-            "jwt": token
-        }
         return response
 
 
@@ -63,12 +56,14 @@ class UserAPIView(APIView):
             raise AuthenticationFailed('Unauthenticated!')
 
 
-
 class LogoutAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request):
         response = Response()
-        response.delete_cookie('jwt')
+        response['Authorization'] = ''
         response.data = {
-            "message": "success"
+            "message": "Successfully logged out."
         }
         return response
+

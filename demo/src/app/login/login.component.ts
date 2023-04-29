@@ -14,7 +14,7 @@ export class LoginComponent{
   }
   login(){
     this.auth.login(this.username, this.password).subscribe((data)=>{
-      localStorage.setItem('token', data.jwt);
+      localStorage.setItem('token', data.token);
       this.auth.isAuth=true;
     })
   }

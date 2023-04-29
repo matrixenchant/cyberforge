@@ -296,6 +296,6 @@ class ModificationSerializer(serializers.ModelSerializer):
         # проверка совместимости процессоров и материнских плат
         if not data['cpu'].socket == data['motherboard'].socket:
             raise serializers.ValidationError("Processor and motherboard are not compatible.")
-        elif not data['motherboard'].socket in data['cooling'].socket.all():
+        elif not data['motherboard'].socket in data['cooling'].sockets.all():
             raise serializers.ValidationError("Motherboard socket and cooling socket are not compatible.")
         return data
