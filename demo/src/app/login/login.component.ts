@@ -10,8 +10,6 @@ export class LoginComponent{
   username:string = ""
   password:string = ""
   constructor(public auth:AuthService){}
-  ngOnInit(){
-  }
   login(){
     this.auth.login(this.username, this.password).subscribe((data)=>{
       localStorage.setItem('token', data.token);

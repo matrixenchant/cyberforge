@@ -1,11 +1,11 @@
-export function checkCompatibility(modification:Modification):Compatibility{
-  if (modification.components.length < 8){
+export function checkCompatibility(components:PCComponent[]):Compatibility{
+  if (components.length < 8){
     return {status:false, message:"Not all the required components are chosen"}
   }
   else{
     let motherboard:PCComponent, cooling:PCComponent, cpu:PCComponent;
     motherboard = cooling = cpu = {id:0, type:"", slug:"", name:"", price:0, rating:0, images:"", spec:[]};
-    for(let x of modification.components){
+    for(let x of components){
       switch(x.type){
         case "Motherboard":
           motherboard = x;

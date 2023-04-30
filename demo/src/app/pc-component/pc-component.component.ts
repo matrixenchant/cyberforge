@@ -29,9 +29,9 @@ export class PcComponentComponent {
     this.modification.components = this.modification.components.filter((component)=>component.type!=type);
   }
   post(){
-    this.compatibility = checkCompatibility(this.modification)
+    this.compatibility = checkCompatibility(this.modification.components)
     if (this.compatibility.status){
-      this.serv.addModification(this.modification).subscribe((data)=>console.log('success!'));
+      this.serv.addModification(this.modification).subscribe((data)=>console.log('Success!'));
       this.modification = {id:0, name: "", description: "", author_name: "", likes: 0,components: []};
     }
   }

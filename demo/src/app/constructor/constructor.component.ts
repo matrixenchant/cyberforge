@@ -20,10 +20,11 @@ export class ConstructorComponent {
       this.currentPage = data; this.modifications = data.results as Modification[]; this.serv.load = false;});
   }
   like(modification:Modification){
-    this.serv.updateModification(modification).subscribe((data) => modification.likes = data.likes)
+    this.serv.updateModification(modification).subscribe(
+      (data) => modification.likes = data.likes)
   }
   delete(id:number){
     this.serv.deleteModification(id).subscribe(()=>this.modifications = this.modifications.filter(
-      (data)=>data.id != id))
+      (data) => data.id != id))
   }
 }

@@ -1,15 +1,27 @@
 from rest_framework import serializers
-from rest_framework.fields import SkipField
+from django.templatetags.static import static
 
-from .models import Modification, Cooling, Housing, PowerSupplyUnit, RAM, GPU, Motherboard, CPU, Memory, Socket
-
-from rest_framework import serializers
+from main import settings
+from .models import Cooling, Housing, PowerSupplyUnit, RAM, GPU, Motherboard, CPU, Memory, Socket
 from .models import Modification
 
 
 class get_spec_ser:
+    # def __init__(self, *args, **kwargs):
+    #     flag = kwargs.pop('flag', None)
+    #     super().__init__(*args, **kwargs)
+    #     self.flag = flag
+
+
+
     def get_spec(self, obj):
         spec_data = []
+        # if self.context.get('flag'):
+        #     for label in obj.spec_labels:
+        #         value = getattr(obj, label['slug'], None)
+        #         spec_data.append(str(value))
+        #
+        # else:
         for label in obj.spec_labels:
             value = getattr(obj, label['slug'], None)
             if value is not None:
@@ -22,6 +34,8 @@ class get_spec_ser:
         return spec_data
 
 
+
+
 class SocketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Socket
@@ -29,11 +43,17 @@ class SocketSerializer(serializers.ModelSerializer):
 
 
 class CoolingSerializer2(serializers.Serializer, get_spec_ser):
+    # def __init__(self, *args, **kwargs):
+    #     is_list = kwargs.pop('is_list', None)
+    #     super().__init__(*args, **kwargs)
+    #     self.is_list = is_list
+
     TYPE_CHOICES = [
         ('CPU Cooler', 'CPU Coolertea'),
         ('Case Fan', 'Case Fan'),
         ('Liquid Cooler', 'Liquid Cooler')
     ]
+    id = serializers.IntegerField()
     name = serializers.CharField(max_length=255)
     price = serializers.DecimalField(max_digits=10, decimal_places=2, allow_null=True)
     type = serializers.CharField(max_length=50, allow_blank=True, allow_null=True)
@@ -46,18 +66,23 @@ class CoolingSerializer2(serializers.Serializer, get_spec_ser):
 
     def get_spec(self, obj):
         spec_data = []
-        for label in obj.spec_labels:
-            value = getattr(obj, label['slug'], None)
-            if value is not None:
-                if label['slug'] == 'sockets':
-                    serializer = SocketSerializer(value, many=True)
-                    value = [item['socket'] for item in serializer.data]
-                    value = ", ".join(value)
-                spec_data.append({
-                    'slug': label['slug'],
-                    'label': label['label'],
-                    'value': str(value)
-                })
+        if self.context.get('flag'):
+            for label in obj.spec_labels:
+                value = getattr(obj, label['slug'], None)
+                spec_data.append(str(value))
+        else:
+            for label in obj.spec_labels:
+                value = getattr(obj, label['slug'], None)
+                if value is not None:
+                    if label['slug'] == 'sockets':
+                        serializer = SocketSerializer(value, many=True)
+                        value = [item['socket'] for item in serializer.data]
+                        value = ", ".join(value)
+                    spec_data.append({
+                        # 'slug': label['slug'],
+                        'label': label['label'],
+                        'value': str(value)
+                    })
 
         return spec_data
 
@@ -83,12 +108,7 @@ class CoolingSerializer2(serializers.Serializer, get_spec_ser):
             instance.sockets.add(socket)
         return instance
 
-    def get_images_url(self, obj):
-        request = self.context.get('request')
-        images = obj.images.all()
-        if images:
-            return [request.build_absolute_uri(image.image.url) for image in images]
-        return []
+
 
 
 class CoolingSerializer(serializers.ModelSerializer):
@@ -98,6 +118,15 @@ class CoolingSerializer(serializers.ModelSerializer):
 
 
 class HousingSerializer(serializers.ModelSerializer, get_spec_ser):
+    def get_images(self, obj):
+        images = obj['images']
+        images_urls = []
+        for image in images:
+            image_path = f"{settings.STATIC_URL}{image}"
+            image_url = self.context['request'].build_absolute_uri(image_path)
+            images_urls.append(image_url)
+        return images_urls
+
     class Meta:
         model = Housing
         fields = '__all__'
@@ -208,7 +237,7 @@ class CPUSerializer(serializers.ModelSerializer, get_spec_ser):
                     serializer = SocketSerializer(value)
                     value = serializer.data['socket']
                 spec_data.append({
-                    'slug': label['slug'],
+                    # 'slug': label['slug'],
                     'label': label['label'],
                     'value': str(value)
                 })
@@ -222,6 +251,7 @@ class CPUSerializer(serializers.ModelSerializer, get_spec_ser):
 
 
 class MemorySerializer(serializers.ModelSerializer, get_spec_ser):
+
     class Meta:
         model = Memory
         fields = '__all__'
@@ -242,6 +272,7 @@ class MemorySerializer(serializers.ModelSerializer, get_spec_ser):
 
 
 class ModificationGetSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
     name = serializers.CharField(max_length=255)
     description = serializers.CharField(max_length=255, default='')
     author_name = serializers.CharField(max_length=255)
@@ -272,13 +303,9 @@ class ModificationGetSerializer(serializers.Serializer):
         for label in obj.components_labels:
             value = getattr(obj, label['slug'], None)
             if value is not None:
-                serializer = comp[label['slug']](value)
+                serializer = comp[label['slug']](value, context={'request': self.context.get('request')}) #, context={'flag': False, 'comp': comp[label['slug']]})
                 value = serializer.data
-                component_data.append({
-                    'slug': label['slug'],
-                    'label': label['label'],
-                    'value': value
-                })
+                component_data.append(value)
 
         return component_data
 
@@ -286,6 +313,8 @@ class ModificationGetSerializer(serializers.Serializer):
         ret = super().to_representation(instance)
         ret['components'] = self.get_component(instance, self.comp)
         return ret
+
+
 
     def validate(self, data):
         # proverka sovmestimosti proccessors and materi

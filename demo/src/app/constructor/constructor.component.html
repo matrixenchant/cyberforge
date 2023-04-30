@@ -9,7 +9,7 @@
     <button *ngIf="auth.isAuth" (click)="delete(modification.id)">Delete</button> <br>
     <ul>
       <li *ngFor="let component of modification.components" style="border: green 1px groove">
-        ID: {{component.type}} <br>
+        ID: {{component.id}} <br>
         Type: {{component.type}} <br>
         Slug: {{component.slug}} <br>
         Name: {{component.name}} <br>
