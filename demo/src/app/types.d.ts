@@ -7,11 +7,9 @@ interface Pagination{
   previous:string|null;
   results:Modification[]|PCComponent[];
 }
-interface User{
-  email : string;
-  phone: string;
-  image : string;
-  modifications : Modification[];
+interface Compatibility{
+  status:boolean;
+  message:string;
 }
 interface Modification{
   id: number;
@@ -38,6 +36,7 @@ interface PCComponentSpec{
   label: string;
   value: string;
 }
+/*
 interface Socket{
   socket: string;
 }
@@ -102,3 +101,10 @@ interface PowerSupplyUnit extends PCComponent{
   form_factor: string;
   noise_level: string;
 }
+interface User{
+  email : string;
+  phone: string;
+  image : string;
+  modifications : Modification[];
+}
+*/

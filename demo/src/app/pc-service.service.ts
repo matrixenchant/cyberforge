@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {catchError, Observable, throwError} from "rxjs";
+import {AuthService} from "./auth.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class PcServiceService {
   BASE_URL = "http://127.0.0.1:8000"
-  constructor(private client:HttpClient) { }
+  constructor(private client:HttpClient, private auth:AuthService) {}
   load:boolean = false;
   getListModification():Observable<Pagination>{
     this.load = true;
@@ -28,7 +29,8 @@ export class PcServiceService {
   }
   getComponent(id:number, type:string):Observable<PCComponent>{
     this.load = true;
-    return this.client.get<PCComponent>(`${this.BASE_URL}/configurator/${type}/${id}/`)
+    return this.client.get<PCComponent>(`${this.BASE_URL}/configurator/${type}/${id}/`).pipe(
+      catchError(this.handleError))
   }
   checkList(modification:Modification){
     let housing, motherboard, power_supply, cpu, gpu, ram, memory, cooling;
@@ -71,7 +73,7 @@ export class PcServiceService {
       likes: modification.likes, housing: list[0], motherboard: list[1], power_supply: list[2],
       cpu: list[3], gpu: list[4], ram: list[5], memory: list[6], cooling: list[7],}).pipe(catchError(this.handleError))
   }
-  updateModification(modification:Modification){
+  updateModification(modification:Modification):Observable<Modification>{
     let list = this.checkList(modification);
     return this.client.put<Modification>(`${this.BASE_URL}/configurator/modifications/${modification.id}/`, {
       name: modification.name, description: modification.description, author_name: modification.author_name,
@@ -84,8 +86,8 @@ export class PcServiceService {
   }
   handleError(error: any) {
     let errorMessage = '';
-    //localStorage.removeItem('token');
-    //this.auth.isAuth = false;
+    localStorage.removeItem('token');
+    this.auth.isAuth = false;
     if (error.error instanceof ErrorEvent) {
       // client-side error
       errorMessage = `Error: ${error.error.message}`;
@@ -98,5 +100,4 @@ export class PcServiceService {
       return errorMessage;
     });
   }
-
 }

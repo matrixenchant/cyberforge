@@ -9,12 +9,15 @@
   <input [(ngModel)]="modification.author_name">
   <br>
   <button *ngIf="auth.isAuth" (click)="post()">Add modification</button> <br>
+  <p *ngIf="!auth.isAuth" style="color:red">You must be logged in if you want to add your computer builds</p>
+  <p *ngIf="!compatibility.status" style="color:red">{{compatibility.message}}</p>
   <p *ngFor="let component of modification.components">
-    {{component.type}} <br>
-    {{component.name}} <br>
-    {{component.price}} <br>
+    Type: {{component.type}} <br>
+    Name: {{component.name}} <br>
+    Price: {{component.price}} <br>
+    Rating: {{component.rating}} <br>
+    <img src="{{component.images}}" width="100px"> <br>
     <button (click)="del(component.type)">Delete</button>
-    <img src="{{component.images}}" width="200px">
   </p>
 </div>
 <div>

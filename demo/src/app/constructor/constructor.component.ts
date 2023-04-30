@@ -10,8 +10,7 @@ import {AuthService} from "../auth.service";
 export class ConstructorComponent {
   modifications:Modification[] = [];
   currentPage:Pagination = {next:null, previous:null, results:[], count:0};
-  constructor(public serv:PcServiceService, public auth:AuthService) {
-  }
+  constructor(public serv:PcServiceService, public auth:AuthService) {}
   ngOnInit(){
     this.serv.getListModification().subscribe((data) => {
       this.currentPage=data; this.modifications=data.results as Modification[]; this.serv.load = false;});
