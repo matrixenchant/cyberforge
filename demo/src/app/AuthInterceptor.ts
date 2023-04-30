@@ -2,10 +2,11 @@ import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/com
 import {Injectable} from "@angular/core";
 import {catchError, Observable, throwError} from "rxjs";
 import {AuthService} from "./auth.service";
+import {PcServiceService} from "./pc-service.service";
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private auth:AuthService) {}
+  constructor(private serv:PcServiceService, private auth:AuthService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = localStorage.getItem('token');
@@ -19,10 +20,16 @@ export class AuthInterceptor implements HttpInterceptor {
             localStorage.removeItem('token');
             this.auth.isAuth = false;
           }
-          return throwError(() => error)})
-        );
+          this.serv.load = false;
+          return throwError(() => error)
+        })
+      );
     }
     return next.handle(req).pipe(
-      catchError((error:any) => {return throwError(() => error)}))
+      catchError((error:any) => {
+        this.serv.load = false;
+        return throwError(() => error)
+      })
+    )
   }
 }
